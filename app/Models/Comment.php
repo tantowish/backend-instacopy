@@ -10,9 +10,9 @@ class Comment extends Model
     use HasFactory;
 
     public function post(){
-        $this->belongsTo(Post::class, 'id');
+        return $this->belongsTo(Post::class, 'post_id');
     }
     public function user(){
-        $this->belongsTo(Post::class, 'id');
+        return $this->belongsTo(Post::class, 'user_id');
     }
 }

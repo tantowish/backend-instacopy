@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Post;
 use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
+use App\Http\Resources\PostResource;
+use App\Http\Resources\PostDetailResource;
 
 class PostController extends Controller
 {
@@ -14,7 +16,10 @@ class PostController extends Controller
     public function index()
     {
         $posts = Post::all();
-        return response()->json($posts);
+        // return response()->json([
+        //     'data'=>$posts,
+        // ]);
+        return PostResource::collection($posts);
     }
 
     /**
@@ -36,9 +41,10 @@ class PostController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Post $post)
+    public function show($id)
     {
-        //
+        $post = Post::findOrFail($id);
+        return new PostDetailResource($post);
     }
 
     /**
@@ -46,7 +52,7 @@ class PostController extends Controller
      */
     public function edit(Post $post)
     {
-        //
+
     }
 
     /**

@@ -11,10 +11,10 @@ class Post extends Model
     protected $fillable=[
         'title', 'news_content', 'author'
     ];
-    public function user(){
-        $this->belongsTo(Post::class, 'id');
+    public function writer(){
+        return $this->belongsTo(User::class, 'author');
     }
     public function comment(){
-        $this->hasMany(Comment::class, 'id');
+        return $this->hasMany(Comment::class, 'comment_id');
     }
 }

@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use Illuminate\Http\Request;
+use App\Http\Resources\PostResource;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
-use App\Http\Resources\PostResource;
 use App\Http\Resources\PostDetailResource;
 
 class PostController extends Controller
@@ -15,11 +17,11 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Post::all();
+        $posts = Post::with('writer:id,username')->get();
         // return response()->json([
         //     'data'=>$posts,
         // ]);
-        return PostResource::collection($posts);
+        return PostDetailResource::collection($posts);
     }
 
     /**
@@ -33,9 +35,17 @@ class PostController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StorePostRequest $request)
+    public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'title'=>'required|max:255',
+            'news_content'=>'required',
+        ]);
+        
+        $validated['author'] = Auth::user()->id;
+        $post  = Post::create($validated);
+
+        return new PostDetailResource($post->loadMissing('writer:id,username'));
     }
 
     /**
@@ -43,7 +53,7 @@ class PostController extends Controller
      */
     public function show($id)
     {
-        $post = Post::findOrFail($id);
+        $post = Post::with('writer:id,username')->findOrFail($id);
         return new PostDetailResource($post);
     }
 
@@ -58,16 +68,30 @@ class PostController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdatePostRequest $request, Post $post)
+    public function update(Request $request,  $id)
     {
-        //
+        $validated = $request->validate([
+            'title'=>'required|max:255',
+            'news_content'=>'required',
+        ]);
+
+        $post = Post::findOrFail($id);
+        $post->update($validated);
+
+        return new PostDetailResource($post->loadMissing('writer:id,username'));
+
+        
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Post $post)
+    public function destroy($id)
     {
-        //
+        $post = Post::findOrFail($id);
+        $post->delete();
+
+        return new PostDetailResource($post->loadMissing('writer:id,username'));
+
     }
 }

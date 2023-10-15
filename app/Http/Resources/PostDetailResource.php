@@ -21,6 +21,7 @@ class PostDetailResource extends JsonResource
             'title'=>$this->title,
             'new_content'=>$this->news_content,
             'created_at'=>$formattedDate,
+            'image'=>$this->image,
             'author'=>$this->whenLoaded('writer'),
             'comments'=>$this->whenLoaded('comment', function(){
                 return collect($this->comment)->each(function($comment){

@@ -7,8 +7,11 @@ use Illuminate\Http\Request;
 use App\Http\Resources\PostResource;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\StorePostRequest;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\UpdatePostRequest;
 use App\Http\Resources\PostDetailResource;
+use Illuminate\Http\File;
+
 
 class PostController extends Controller
 {
@@ -41,6 +44,15 @@ class PostController extends Controller
             'title'=>'required|max:255',
             'news_content'=>'required',
         ]);
+
+        if($request->file){
+            $fileName = $this->generateRandomString();
+            $extension = $request->file->extension();
+            $validated['image']=$fileName.'.'.$extension;
+
+
+            Storage::putFileAs('image', $request->file , $fileName.'.'.$extension);
+        }
         
         $validated['author'] = Auth::user()->id;
         $post  = Post::create($validated);
@@ -93,5 +105,15 @@ class PostController extends Controller
 
         return new PostDetailResource($post->loadMissing('writer:id,username'));
 
+    }
+
+    function generateRandomString($length = 10) {
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $charactersLength = strlen($characters);
+        $randomString = '';
+        for ($i = 0; $i < $length; $i++) {
+            $randomString .= $characters[random_int(0, $charactersLength - 1)];
+        }
+        return $randomString;
     }
 }

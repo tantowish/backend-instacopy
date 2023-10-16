@@ -4,13 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use Illuminate\Http\Request;
-use App\Http\Resources\PostResource;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Requests\StorePostRequest;
 use Illuminate\Support\Facades\Storage;
-use App\Http\Requests\UpdatePostRequest;
 use App\Http\Resources\PostDetailResource;
-use Illuminate\Http\File;
 
 
 class PostController extends Controller
@@ -20,7 +16,7 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Post::with('writer:id,username', 'comment:id,post_id,user_id,comments_content')->get();
+        $posts = Post::with('writer:id,username,image', 'comment:id,post_id,user_id,comments_content')->get();
         // return response()->json([
         //     'data'=>$posts,
         // ]);
@@ -41,17 +37,13 @@ class PostController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title'=>'required|max:255',
-            'news_content'=>'required',
+            'posts_content'=>'required',
+            'image'=>'required'
         ]);
 
-        if($request->file){
-            $fileName = $this->generateRandomString();
-            $extension = $request->file->extension();
-            $validated['image']=$fileName.'.'.$extension;
 
-
-            Storage::putFileAs('image', $request->file , $fileName.'.'.$extension);
+        if($request->file('image')){
+            $validated['image'] = $request->file('image')->store('/image/posts');
         }
         
         $validated['author'] = Auth::user()->id;
@@ -65,7 +57,7 @@ class PostController extends Controller
      */
     public function show($id)
     {
-        $post = Post::with('writer:id,username', 'comment:id,post_id,user_id,comments_content')->findOrFail($id);
+        $post = Post::with('writer:id,username,image', 'comment:id,post_id,user_id,comments_content,created_at')->findOrFail($id);
         return new PostDetailResource($post);
     }
 
@@ -82,14 +74,46 @@ class PostController extends Controller
      */
     public function update(Request $request,  $id)
     {
+        // $validated = $request->validate([
+        //     'title'=>'required|max:255',
+        //     'news_content'=>'required',
+        // ]);
+
+        // $post = Post::findOrFail($id);
+        // $post->update($validated);
+
+        // return new PostDetailResource($post->loadMissing('writer:id,username'));
+
+        // Validate the incoming request
         $validated = $request->validate([
-            'title'=>'required|max:255',
-            'news_content'=>'required',
+            'posts_content' => 'required',
+            'image'=>'required'
         ]);
 
+        // Find the post you want to update
         $post = Post::findOrFail($id);
-        $post->update($validated);
 
+        // Handle the image update if a new file is provided
+        if ($request->hasFile('image')) {
+            $fileName = $this->generateRandomString();
+            $extension = $request->file('image')->extension();
+            $validated['image'] = $fileName . '.' . $extension;
+
+            // Store the new image and delete the old one
+            Storage::putFileAs('/public/image/posts', $request->file('image'), $fileName . '.' . $extension);
+            if ($post->image) {
+                Storage::delete('/public/image/posts/' . $post->image);
+            }
+        }
+
+        // Update other fields as needed
+        $post->title = $validated['title'];
+        $post->news_content = $validated['news_content'];
+
+        // Save the updated post
+        $post->save();
+
+        // Return a response, e.g., the updated post details
         return new PostDetailResource($post->loadMissing('writer:id,username'));
 
         

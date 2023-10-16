@@ -18,8 +18,7 @@ class PostDetailResource extends JsonResource
         $formattedDate =  Carbon::parse($this->created_at)->format('Y-m-d H:i:s');
         return [
             'id'=>$this->id,
-            'title'=>$this->title,
-            'new_content'=>$this->news_content,
+            'posts_content'=>$this->posts_content,
             'created_at'=>$formattedDate,
             'image'=>$this->image,
             'author'=>$this->whenLoaded('writer'),

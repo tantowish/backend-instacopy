@@ -15,10 +15,12 @@ class AccountResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'username'=>$this->id,
+            'id'=>$this->id,
+            'username'=>$this->username,
             'email'=>$this->email,
             'firstName'=>$this->firstName,
             'lastName'=>$this->lastName,
+            'image'=>$this->image,
             'posts'=>$this->whenLoaded('post', function(){
                 return collect($this->post)->each(function($post){
                     return $post;

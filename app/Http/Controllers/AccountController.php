@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Storage;
 
 class AccountController extends Controller
 {
-    public function me(){
+    public function profile(){
         $user = User::findOrFail(Auth::user()->id);
         return new AccountResource($user->loadMissing('post'));
     }

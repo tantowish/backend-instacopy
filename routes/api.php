@@ -36,7 +36,7 @@ Route::middleware(['auth:sanctum'])->group(function(){
     Route::patch('/comment/{id}', [CommentController::class, 'update'])->middleware('CommentOwner'); 
     Route::delete('/comment/{id}', [CommentController::class, 'destroy'])->middleware('CommentOwner');
     
-    Route::get('/profile', [AccountController::class, 'me']);
+    Route::get('/profile', [AccountController::class, 'profile']);
     Route::patch('/profile/{id}', [AccountController::class, 'update'])->middleware('self');
 });
 

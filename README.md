@@ -7,3 +7,8 @@
     Run php artisan migrate
     Run php artisan db:seed to run seeders, if any.
     Run php artisan serve
+
+You can utilize the API, and see the documentation
+
+alse here is the front end example that utilize the API
+https://github.com/tantowish/frontend-instacopy

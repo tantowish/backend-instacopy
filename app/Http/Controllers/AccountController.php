@@ -24,7 +24,7 @@ class AccountController extends Controller
         ]);
         $validated['password'] = bcrypt($validated['password']);
         $user = User::create($validated);
-        return new AccountResource($user->loadMissing('post:id,title'));
+        return new AccountResource($user->loadMissing('post:id,posts_content'));
     }
 
     public function update(Request $request, $id){
@@ -32,6 +32,7 @@ class AccountController extends Controller
             'password'=>'required',
             'firstName'=>'required'
         ];
+
 
 
         $user = User::findOrFail($id);
@@ -59,6 +60,7 @@ class AccountController extends Controller
             }
             $validated['image'] = $request->file('image')->store('/image/users');
         }
+        $validated['password'] = bcrypt($validated['password']);
 
         User::where('id', $id)->update($validated);
 

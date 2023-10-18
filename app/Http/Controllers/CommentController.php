@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\CommentResource;
 use App\Models\Comment;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Resources\CommentResource;
 use App\Http\Requests\StoreCommentRequest;
 use App\Http\Requests\UpdateCommentRequest;
-use Illuminate\Http\Request;
 
 class CommentController extends Controller
 {
@@ -36,7 +37,7 @@ class CommentController extends Controller
             'comments_content'=>'required'
         ]);
 
-        $validated['user_id']=auth()->user()->id;
+        $validated['user_id']=Auth::user()->id;
 
         $comment = Comment::create($validated);
 

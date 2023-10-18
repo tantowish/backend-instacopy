@@ -27,21 +27,26 @@ use App\Http\Controllers\CommentController;
 
 
 Route::middleware(['auth:sanctum'])->group(function(){
+    // Auth & Account routing
     Route::get('/logout',[AuthenticationController::class, 'logout']);
     Route::post('/posts', [PostController::class, 'store']);
-    Route::patch('/posts/{id}', [PostController::class, 'update'])->middleware('PostOwner');
-    Route::delete('/posts/{id}', [PostController::class, 'destroy'])->middleware('PostOwner');
+    Route::get('/profile', [AccountController::class, 'profile']);
+    Route::patch('/profile/{id}', [AccountController::class, 'update'])->middleware('self');
     
+    // Comment routing
     Route::post('/comment', [CommentController::class, 'store']); 
     Route::patch('/comment/{id}', [CommentController::class, 'update'])->middleware('CommentOwner'); 
     Route::delete('/comment/{id}', [CommentController::class, 'destroy'])->middleware('CommentOwner');
     
-    Route::get('/profile', [AccountController::class, 'profile']);
-    Route::patch('/profile/{id}', [AccountController::class, 'update'])->middleware('self');
+    // Posts routing
+    Route::patch('/posts/{id}', [PostController::class, 'update'])->middleware('PostOwner');
+    Route::delete('/posts/{id}', [PostController::class, 'destroy'])->middleware('PostOwner');
 });
 
+// Posts routing
 Route::get('/posts',[PostController::class, 'index']);
 Route::get('/posts/{id}',[PostController::class, 'show']); 
 
+// Auth & Account Routing
 Route::post('/login', [AuthenticationController::class, 'login']);
 Route::post('/register', [AccountController::class, 'register']);

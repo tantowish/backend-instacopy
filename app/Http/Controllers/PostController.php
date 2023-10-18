@@ -42,9 +42,9 @@ class PostController extends Controller
         ]);
 
 
-        if($request->file('image')){
-            $validated['image'] = $request->file('image')->store('/image/posts');
-        }
+        // if($request->file('image')){
+        //     $validated['image'] = $request->file('image')->store('/image/posts');
+        // }
         
         $validated['author'] = Auth::user()->id;
         $post  = Post::create($validated);
@@ -72,19 +72,8 @@ class PostController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request,  $id)
+    public function update(Request $request, string $id)
     {
-        // $validated = $request->validate([
-        //     'title'=>'required|max:255',
-        //     'news_content'=>'required',
-        // ]);
-
-        // $post = Post::findOrFail($id);
-        // $post->update($validated);
-
-        // return new PostDetailResource($post->loadMissing('writer:id,username'));
-
-        // Validate the incoming request
         $validated = $request->validate([
             'posts_content' => 'required',
             'image'=>'required'
@@ -94,25 +83,25 @@ class PostController extends Controller
         $post = Post::findOrFail($id);
 
         // Handle the image update if a new file is provided
-        if ($request->hasFile('image')) {
-            $fileName = $this->generateRandomString();
-            $extension = $request->file('image')->extension();
-            $validated['image'] = $fileName . '.' . $extension;
+        // if ($request->hasFile('image')) {
+        //     $fileName = $this->generateRandomString();
+        //     $extension = $request->file('image')->extension();
+        //     $validated['image'] = $fileName . '.' . $extension;
 
-            // Store the new image and delete the old one
-            Storage::putFileAs('/public/image/posts', $request->file('image'), $fileName . '.' . $extension);
-            if ($post->image) {
-                Storage::delete('/public/image/posts/' . $post->image);
-            }
-        }
+        //     // Store the new image and delete the old one
+        //     Storage::putFileAs('/public/image/posts', $request->file('image'), $fileName . '.' . $extension);
+        //     if ($post->image) {
+        //         Storage::delete('/public/image/posts/' . $post->image);
+        //     }
+        // }
 
         // Update other fields as needed
-        $post->title = $validated['title'];
-        $post->news_content = $validated['news_content'];
+        $post->posts_content = $validated['posts_content'];
+        $post->image = $validated['image'];
 
         // Save the updated post
         $post->save();
-
+        
         // Return a response, e.g., the updated post details
         return new PostDetailResource($post->loadMissing('writer:id,username'));
 

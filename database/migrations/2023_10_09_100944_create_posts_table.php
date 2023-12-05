@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->text("posts_content");
             $table->unsignedBigInteger('author');
-            $table->string('image');
+            $table->string('image')->nullable();
             $table->foreign('author')->references('id')->on('users');
             $table->timestamps();
             $table->softDeletes();
